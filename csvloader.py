@@ -32,10 +32,10 @@ class CSVLoader:
                 mapped_df = pd.DataFrame(mapped_data)
 
                 # Append transactions to ledger
-                # TODO: verify transaction not already in
-                
+                # TODO: improvement - check better if transaction not already in ledger
+
                 for _, row in mapped_df.iterrows():
-                    if row["Quantity"]>0:
+                    if row["Quantity"]>0 and row["Transaction External ID"] not in self.ledger.transactions["Transaction External ID"].values:
                         self.ledger.add_transaction(
                             transation_eid=row["Transaction External ID"],
                             date=row["Date"],

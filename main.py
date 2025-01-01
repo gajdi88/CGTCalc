@@ -22,5 +22,6 @@ ledger.add_transaction(
 
 csv_loader = CSVLoader(ledger)
 csv_loader.load_csv('./data/trading23-24.csv','ii')
+csv_loader.load_csv('./data/trading23-24.csv','ii')
 
 print(ledger.transactions)
