@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-import logging
+# import logging
 
 class Ledger:
     def __init__(self):
@@ -31,7 +31,7 @@ class Ledger:
         self.transactions = pd.concat([self.transactions, pd.DataFrame([new_transaction])], ignore_index=True)
 
     def calculate_cgt(self) -> float:
-        logging.warning("The calculate_cgt implementation does not work yet.")
+        # logging.warning("The calculate_cgt implementation does not work yet.")
 
         # Calculate CGT for all transactions
         self.transactions["CGT"] = self.transactions.apply(lambda row: self._calculate_tax(row), axis=1)
