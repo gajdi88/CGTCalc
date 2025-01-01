@@ -11,6 +11,12 @@ class CSVLoader:
             data = pd.read_csv(file_path)
 
             if template == "ii":
+                # Clean data by handling NaNs and formatting numbers
+                data["Credit"] = data["Credit"].replace({r'[£,]': ''}, regex=True).astype(float)
+                data["Debit"] = data["Debit"].replace({r'[£,]': ''}, regex=True).astype(float)
+                data["Quantity"] = data["Quantity"].replace({r'[£,]': ''}, regex=True).astype(float)
+                data["Price"] = data["Price"].replace({r'[£,]': ''}, regex=True).astype(float)
+
                 mapped_data = {
                     "Date": data["Settlement Date"],
                     "Transaction External ID": data["Reference"],
@@ -26,18 +32,21 @@ class CSVLoader:
                 mapped_df = pd.DataFrame(mapped_data)
 
                 # Append transactions to ledger
+                # TODO: verify transaction not already in
+                
                 for _, row in mapped_df.iterrows():
-                    self.ledger.add_transaction(
-                        date=row["Date"],
-                        account_name="Unknown",  # Default placeholder
-                        amount=row["Amount"],
-                        transaction_type=row["Transaction Type"],
-                        transaction_external_id=row["Transaction External ID"],
-                        stock_name=row["Stock Name"],
-                        quantity=row["Quantity"],
-                        price_per_stock=row["Price Per Stock"],
-                        description=row["Description"]
-                    )
+                    if row["Quantity"]>0:
+                        self.ledger.add_transaction(
+                            transation_eid=row["Transaction External ID"],
+                            date=row["Date"],
+                            account_name="Unknown",  # Default placeholder
+                            amount=row["Amount"],
+                            transaction_type=row["Transaction Type"],
+                            stock_name=row["Stock Name"],
+                            quantity=row["Quantity"],
+                            price_per_stock=row["Price Per Stock"],
+                            description=row["Description"]
+                        )
             else:
                 raise ValueError("Unsupported template")
 
