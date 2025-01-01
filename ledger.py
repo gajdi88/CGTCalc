@@ -9,6 +9,9 @@ class Ledger:
             "Transaction ID", "Date", "Account Name", "Amount",
             "Stock Name", "Quantity", "Price Per Stock", "Tax Paid", "Transaction Type"
         ])
+        self.tax_years = pd.DataFrame(columns=[
+            "Tax Year", "Date"
+        ])
 
     def add_transaction(self, transation_eid: str, date: str, account_name: str, amount: float, transaction_type: str, **kwargs) -> None:
         # Determine the next Transaction ID

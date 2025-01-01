@@ -3,6 +3,15 @@ from datetime import datetime
 from ledger import Ledger
 from csvloader import CSVLoader
 
+# todo: function to give CGT percentage based on date
+# todo: function to give total asset holding at a given date
+# todo: function to give CGT allowance for current tax year
+# todo: ledger of losses made that carry forwards
+# CGT applies when selling - so calculate it for every sale
+#       need cost basis for transaction - but flag if re-sold in 30 days
+#       need CGT percentage
+# CGT becomes liable for everything that happened in the tax year - minus allowance minus losses
+
 pd.set_option('display.max_columns', None)
 
 # Example Usage
