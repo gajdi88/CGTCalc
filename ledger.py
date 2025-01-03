@@ -87,15 +87,6 @@ class Ledger:
                 return max(0, row["Amount"] * 0.15 - row["Tax Paid"])  # Example: 15% tax minus paid
         return 0
 
-    def summary(self) -> None:
-        # Provide a quick summary of CGT paid and outstanding
-        total_cgt = self.calculate_cgt()
-        total_paid = self.transactions["Tax Paid"].sum()
-        outstanding = total_cgt - total_paid
-        print(f"Total CGT Required: {total_cgt:.2f}")
-        print(f"Total Tax Paid: {total_paid:.2f}")
-        print(f"Outstanding CGT: {outstanding:.2f}")
-
     def filter_transactions(self, transaction_type: str = None) -> pd.DataFrame:
         # Filter transactions by type or other attributes
         if transaction_type:
