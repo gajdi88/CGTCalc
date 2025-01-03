@@ -7,7 +7,8 @@ class Ledger:
         # Initialize the DataFrame with predefined columns
         self.transactions = pd.DataFrame(columns=[
             "Transaction ID","Transaction External ID", "Date", "Account Name", "Amount",
-            "Stock Name", "Quantity", "Price Per Stock", "Tax Paid", "Transaction Type"
+            "Stock Name", "Quantity", "Price Per Stock", "Tax Paid", "Transaction Type",
+            "CPPS"
         ])
         self.tax_years = pd.DataFrame(columns=[
             "Tax Year", "Date"
@@ -29,6 +30,7 @@ class Ledger:
             "Quantity": kwargs.get("quantity", None),
             "Price Per Stock": kwargs.get("price_per_stock", None),
             "Tax Paid": kwargs.get("tax_paid", None),
+            "CPPS": kwargs.get("cpps", None)
         }
         if not self.transactions.empty:
             self.transactions = pd.concat([self.transactions, pd.DataFrame([new_transaction])], ignore_index=True)

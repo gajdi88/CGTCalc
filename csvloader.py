@@ -11,8 +11,8 @@ class CSVLoader:
 
         if template == "ii":
             # Clean data by handling NaNs and formatting numbers
-            data["Credit"] = data["Credit"].replace({r'[£,]': ''}, regex=True).astype(float)
-            data["Debit"] = data["Debit"].replace({r'[£,]': ''}, regex=True).astype(float)
+            data["Credit"] = data["Credit"].replace({r'[£,]': ''}, regex=True).astype(float).fillna(0)
+            data["Debit"] = data["Debit"].replace({r'[£,]': ''}, regex=True).astype(float).fillna(0)
             data["Quantity"] = data["Quantity"].replace({r'[£,]': ''}, regex=True).astype(float)
             data["Price"] = data["Price"].replace({r'[£,]': ''}, regex=True).astype(float)
 
@@ -21,10 +21,11 @@ class CSVLoader:
                 "Transaction External ID": data["Reference"],
                 "Stock Name": data["Sedol"],
                 "Quantity": data["Quantity"],
-                "Price Per Stock": data["Price"],
+                "Price Per Stock": data["Price"], # note, II confuses currencies in exports
                 "Description": data["Description"],
                 "Amount": data.apply(lambda row: row["Credit"] - row["Debit"], axis=1),
-                "Transaction Type": "Stock"  # For "ii" template, all transactions are Stocks
+                "Transaction Type": "Stock",  # For "ii" template, all transactions are Stocks
+                "CPPS": data.apply(lambda row: row["Credit"] - row["Debit"], axis=1) / data["Quantity"]
             }
 
             # Create a DataFrame with mapped data
@@ -44,7 +45,8 @@ class CSVLoader:
                         stock_name=row["Stock Name"],
                         quantity=row["Quantity"],
                         price_per_stock=row["Price Per Stock"],
-                        description=row["Description"]
+                        description=row["Description"],
+                        cpps=row["CPPS"]
                     )
 
 
