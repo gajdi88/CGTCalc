@@ -6,7 +6,7 @@ class Ledger:
     def __init__(self):
         # Initialize the DataFrame with predefined columns
         self.transactions = pd.DataFrame(columns=[
-            "Transaction ID", "Date", "Account Name", "Amount",
+            "Transaction ID","Transaction External ID", "Date", "Account Name", "Amount",
             "Stock Name", "Quantity", "Price Per Stock", "Tax Paid", "Transaction Type"
         ])
         self.tax_years = pd.DataFrame(columns=[
