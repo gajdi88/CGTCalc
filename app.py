@@ -32,7 +32,7 @@ def upload_file():
 @app.route('/ledger')
 def show_ledger():
     transactions = ledger.transactions.to_html(classes='table table-striped')
-    return render_template('ledger.html', tables=[transactions])
+    return render_template('ledger.html', tables=transactions)
 
 if __name__ == '__main__':
     app.run(debug=True)
