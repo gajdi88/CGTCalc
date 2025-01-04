@@ -57,7 +57,7 @@ class Ledger:
         stock_transactions = self.transactions[self.transactions["Stock Name"] == stock_name]
 
         # Filter transactions up to the given date
-        stock_transactions = stock_transactions[stock_transactions["Date"] <= pd.to_datetime(date)]
+        stock_transactions = stock_transactions[stock_transactions["Date"] < pd.to_datetime(date)]
 
         # Calculate the total quantity
         total_quantity = stock_transactions["Quantity"].sum()
