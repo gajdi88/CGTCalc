@@ -7,7 +7,7 @@ class CSVLoader:
         self.ledger = ledger
 
     def load_csv(self, file_path: str, template: str) -> None:
-        data = pd.read_csv(file_path)
+        data = pd.read_csv(file_path, dtype={"Sedol": str})
 
         if template == "ii":
             # Clean data by handling NaNs and formatting numbers
