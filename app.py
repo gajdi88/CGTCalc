@@ -3,6 +3,7 @@ import pandas as pd
 from ledger import Ledger
 from csvloader import CSVLoader
 import os
+from cgt import cgt
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -33,6 +34,16 @@ def upload_file():
 def show_ledger():
     transactions = ledger.transactions.to_html(classes='table table-striped')
     return render_template('ledger.html', tables=transactions)
+
+@app.route('/calculate_cgt')
+def calculate_cgt():
+    transactions_td = ledger.transactions.to_html(classes='table table-striped')
+    cgt_calculator = cgt(ledger)
+    cgt_calculator.calculate_yearly_cgt_liability("2024/2025")
+    cgt_tables_td = cgt_calculator.calcs.to_html(classes='table table-striped')
+    print(cgt_calculator.calcs)
+    return render_template('ledger.html', tables=transactions_td, cgt_tables=cgt_tables_td)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

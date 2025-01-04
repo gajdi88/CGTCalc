@@ -13,6 +13,16 @@
         {{ tables|safe }}
       </div>
       <a href="/" class="btn btn-primary mt-3">Upload Another CSV</a>
+      <a href="/calculate_cgt" class="btn btn-primary mt-3">Calculate CGT</a>
     </div>
+  <!-- add a table for cgt.calcs -->
+    <div class="container">
+      <h1 class="mt-5">CGT Calculations</h1>
+        <div class="table-responsive">
+            {{ cgt_tables|safe }}
+        </div>
+        <a href="/" class="btn btn-primary mt-3">Upload Another CSV</a>
+      </div>
+
   </body>
 </html>
