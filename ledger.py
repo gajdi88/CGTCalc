@@ -37,19 +37,8 @@ class Ledger:
         else:
             self.transactions = pd.DataFrame([new_transaction])
 
-    def calculate_cgt_per_stock(self, stock_name) -> float:
-        # WIP
-
-        # Filter transactions for the given stock
-        stock_transactions = self.transactions[self.transactions["Stock Name"] == stock_name]
-
-        # Calculate CGT liability for each transaction
-        stock_transactions["CGT Liability"] = stock_transactions.apply(self._calculate_cgt, axis=1)
-
-        # Sum up the CGT liabilities
-        total_cgt = stock_transactions["CGT Liability"].sum()
-
-        return total_cgt
+        # sort transactions by date
+        self.transactions = self.transactions.sort_values(by="Date")
 
 
     def stock_holding_at_date(self, stock_name, date) -> float:
@@ -66,7 +55,7 @@ class Ledger:
     def stock_average_purchase_price_at_date(self, stock_name, date) -> float:
         # Filter transactions for the given stock
         stock_transactions = self.transactions[self.transactions["Stock Name"] == stock_name]
-        stock_transactions = stock_transactions[stock_transactions["Date"] <= pd.to_datetime(date)]
+        stock_transactions = stock_transactions[stock_transactions["Date"] < pd.to_datetime(date)]
 
         # Filter to only buy transactions
         buy_transactions = stock_transactions[stock_transactions["Amount"] < 0]
@@ -75,20 +64,11 @@ class Ledger:
         if buy_transactions.empty:
             return 0
         else:
-            total_quantity = buy_transactions["Quantity"].sum()
-            total_cost = (buy_transactions["Quantity"] * buy_transactions["Price Per Stock"]).sum()
-            average_price = total_cost / total_quantity
-            return average_price
+            # total_quantity = buy_transactions["Quantity"].sum()
+            total_cost = (buy_transactions["Amount"]).sum()
 
-    def _calculate_tax(self, row: pd.Series) -> float:
-        # Define tax calculation logic based on transaction type
-        if row["Transaction Type"] == "Stock":
-            if pd.notna(row["Quantity"]) and pd.notna(row["Price Per Stock"]):
-                return row["Quantity"] * row["Price Per Stock"] * 0.2  # Example: 20% tax
-        elif row["Transaction Type"] == "Interest":
-            if pd.notna(row["Amount"]) and pd.notna(row["Tax Paid"]):
-                return max(0, row["Amount"] * 0.15 - row["Tax Paid"])  # Example: 15% tax minus paid
-        return 0
+            return abs(total_cost)
+
 
     def filter_transactions(self, transaction_type: str = None) -> pd.DataFrame:
         # Filter transactions by type or other attributes

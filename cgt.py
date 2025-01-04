@@ -25,12 +25,13 @@ class cgt:
                 if self.is_taxable(transaction):
                     date = transaction["Date"]
                     quantity = transaction["Quantity"]
-                    price_per_stock = transaction["Price Per Stock"]
+                    amount = transaction["Amount"]
+                    price_per_stock = transaction["CPPS"]
 
                     holding = self.ledger.stock_holding_at_date(stock_name, date)
-                    avg_price = self.ledger.stock_average_purchase_price_at_date(stock_name, date)
+                    total_cost = self.ledger.stock_average_purchase_price_at_date(stock_name, date)
 
-                    gain = (price_per_stock - avg_price) * quantity
+                    gain = amount - total_cost
                     tax_rate = self.get_tax_rate(date)
                     tax_liability = gain * tax_rate
 
