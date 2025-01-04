@@ -66,9 +66,10 @@ class Ledger:
     def stock_average_purchase_price_at_date(self, stock_name, date) -> float:
         # Filter transactions for the given stock
         stock_transactions = self.transactions[self.transactions["Stock Name"] == stock_name]
+        stock_transactions = stock_transactions[stock_transactions["Date"] <= pd.to_datetime(date)]
 
         # Filter to only buy transactions
-        buy_transactions = stock_transactions[stock_transactions["Quantity"] > 0]
+        buy_transactions = stock_transactions[stock_transactions["Amount"] < 0]
 
         # Calculate the weighted average purchase price
         if buy_transactions.empty:
