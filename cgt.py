@@ -39,6 +39,10 @@ class cgt:
                         yearly_cgt_liability[year] = 0.0
                     yearly_cgt_liability[year] += tax_liability
 
+                    # append transaction to calcs dataframe
+                    row_to_add = pd.concat([transaction,pd.Series({"Tax Year": year, "CGT Liability": tax_liability})])
+                    self.calcs = self.calcs.append(row_to_add, ignore_index=True)
+
         for year in yearly_cgt_liability:
             tax_allowance = self.get_tax_allowance(year)
             yearly_cgt_liability[year] = max(0, yearly_cgt_liability[year] - tax_allowance)
@@ -75,7 +79,7 @@ class cgt:
 
     def is_taxable(self, transaction: pd.Series) -> bool:
         # Define logic to determine if a transaction is taxable
-        return transaction["Quantity"] < 0  # Example: only sell transactions are taxable
+        return transaction["Amount"] > 0  # Example: only sell transactions are taxable
 
     def get_rolled_forward_losses(self, year: str) -> float:
         # Implement logic to determine rolled forward losses from previous years
