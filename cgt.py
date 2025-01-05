@@ -8,45 +8,72 @@ class cgt:
         # calcs as dataframe, extending the columns of the transactions dataframe
         self.calcs = pd.DataFrame(columns=list(self.ledger.transactions.columns) + ["Tax Year", "CGT Liability"])
 
-
-    def calculate_yearly_cgt_liability(self, tax_year: str = None):
+    def calculate_yearly_cgt_liability(self):
         transactions = self.ledger.transactions
         yearly_cgt_liability = {}
+        carried_forward_losses = 0.0  # Tracks losses carried forward from previous years
 
-        if tax_year:
-            transactions = transactions[transactions.apply(lambda x: self.get_tax_year(x["Date"]) == tax_year, axis=1)]
 
-        for stock_name in transactions["Stock Name"].unique():
-            stock_transactions = transactions[transactions["Stock Name"] == stock_name]
-            # sort stock transactions by date
-            stock_transactions = stock_transactions.sort_values(by="Date")
+        # Group transactions by tax year for sequential processing
+        transactions["Tax Year"] = transactions["Date"].apply(lambda x: self.get_tax_year(x))
+        grouped_transactions = transactions.groupby("Tax Year")
 
-            for _, transaction in stock_transactions.iterrows():
+        for tax_year, year_transactions in grouped_transactions:
+            tax_free_allowance = self.get_tax_free_allowance(tax_year)
+            year_transactions = year_transactions.sort_values(by="Date")
+            total_gains = 0.0
+            total_losses = 0.0
+
+            for _, transaction in year_transactions.iterrows():
                 if self.is_taxable(transaction):
                     date = transaction["Date"]
                     quantity = transaction["Quantity"]
                     amount = transaction["Amount"]
                     price_per_stock = transaction["CPPS"]
 
-                    holding = self.ledger.stock_holding_at_date(stock_name, date)
-                    total_cost = self.ledger.stock_average_purchase_price_at_date(stock_name, date)
+                    holding = self.ledger.stock_holding_at_date(transaction["Stock Name"], date)
+                    total_cost = self.ledger.stock_average_purchase_price_at_date(transaction["Stock Name"], date)
 
-                    gain = amount - total_cost
-                    tax_rate = self.get_tax_rate(date)
-                    tax_liability = gain * tax_rate
+                    gain_or_loss = amount - total_cost
 
-                    year = self.get_tax_year(date)
-                    if year not in yearly_cgt_liability:
-                        yearly_cgt_liability[year] = 0.0
-                    yearly_cgt_liability[year] += tax_liability
+                    if gain_or_loss > 0:
+                        total_gains += gain_or_loss
+                    else:
+                        total_losses += abs(gain_or_loss)  # Track absolute value of losses
 
-                    # append transaction to calcs dataframe
-                    row_to_add = pd.concat([transaction,pd.Series({"Tax Year": year, "CGT Liability": tax_liability})])
-                    self.calcs = pd.concat([self.calcs, row_to_add.to_frame().T], ignore_index=True)
+            # Deduct current year's losses from gains
+            net_gains = total_gains - total_losses
 
-        for year in yearly_cgt_liability:
-            tax_allowance = self.get_tax_allowance(year)
-            yearly_cgt_liability[year] = max(0, yearly_cgt_liability[year] - tax_allowance)
+            # Apply carried forward losses if gains remain
+            if net_gains > 0:
+                net_gains -= carried_forward_losses
+                carried_forward_losses = max(0.0, -net_gains)  # If net_gains goes negative, carry forward
+
+            # If net gains are below the tax-free allowance, no tax liability for the year
+            if net_gains <= tax_free_allowance:
+                yearly_cgt_liability[tax_year] = 0.0
+                carried_forward_losses += max(0.0, tax_free_allowance - net_gains)
+            else:
+                # Calculate tax liability on gains above the allowance
+                taxable_gain = net_gains - tax_free_allowance
+                tax_rate = self.get_tax_rate(tax_year)
+                tax_liability = taxable_gain * tax_rate
+                yearly_cgt_liability[tax_year] = tax_liability
+
+                # Update the carried forward losses for the next year
+                carried_forward_losses += max(0.0, -taxable_gain)
+
+            # Record calculations in the calcs dataframe
+            row_to_add = pd.DataFrame({
+                "Tax Year": [tax_year],
+                "Total Gains": [total_gains],
+                "Total Losses": [total_losses],
+                "Carried Forward Losses": [carried_forward_losses],
+                "Tax-Free Allowance": [tax_free_allowance],
+                "Taxable Gains": [max(0.0, net_gains - tax_free_allowance)],
+                "CGT Liability": [yearly_cgt_liability[tax_year]],
+            })
+            self.calcs = pd.concat([self.calcs, row_to_add], ignore_index=True)
 
         return yearly_cgt_liability
 
@@ -87,7 +114,7 @@ class cgt:
         # Placeholder implementation
         return 0.0
 
-    def get_tax_allowance(self, year: str) -> float:
+    def get_tax_free_allowance(self, year: str) -> float:
         start_year = int(year.split('/')[0])
         if start_year >= 2024:
             return 3000.0

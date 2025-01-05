@@ -17,7 +17,8 @@ def index():
     transactions = ledger.transactions.to_html(classes='table table-striped')
     # only calculate cgt if route is calculate_cgt
     cgt_calculator = cgt(ledger)
-    if request.path == '/calculate_cgt': cgt_calculator.calculate_yearly_cgt_liability("2023/2024")
+    if request.path == '/calculate_cgt':
+        cgt_calculator.calculate_yearly_cgt_liability()
     cgt_tables = cgt_calculator.calcs.to_html(classes='table table-striped')
     return render_template('index.html', tables=transactions, cgt_tables=cgt_tables)
 
