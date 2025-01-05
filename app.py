@@ -10,10 +10,16 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 ledger = Ledger()
-
+# add multiple routes: /upload, /, /cgt
 @app.route('/')
+@app.route('/calculate_cgt')
 def index():
-    return render_template('index.html')
+    transactions = ledger.transactions.to_html(classes='table table-striped')
+    # only calculate cgt if route is calculate_cgt
+    cgt_calculator = cgt(ledger)
+    if request.path == '/calculate_cgt': cgt_calculator.calculate_yearly_cgt_liability("2023/2024")
+    cgt_tables = cgt_calculator.calcs.to_html(classes='table table-striped')
+    return render_template('index.html', tables=transactions, cgt_tables=cgt_tables)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -27,23 +33,9 @@ def upload_file():
         file.save(file_path)
         csv_loader = CSVLoader(ledger)
         csv_loader.load_csv(file_path, 'ii')
-        return redirect(url_for('show_ledger'))
+        # return redirect(url_for('index'))
+        return redirect('/')
     return redirect(request.url)
-
-@app.route('/ledger')
-def show_ledger():
-    transactions = ledger.transactions.to_html(classes='table table-striped')
-    return render_template('ledger.html', tables=transactions)
-
-@app.route('/calculate_cgt')
-def calculate_cgt():
-    transactions_td = ledger.transactions.to_html(classes='table table-striped')
-    cgt_calculator = cgt(ledger)
-    cgt_calculator.calculate_yearly_cgt_liability("2023/2024")
-    cgt_tables_td = cgt_calculator.calcs.to_html(classes='table table-striped')
-    print(cgt_calculator.calcs)
-    return render_template('ledger.html', tables=transactions_td, cgt_tables=cgt_tables_td)
-
 
 if __name__ == '__main__':
     app.run(debug=True)

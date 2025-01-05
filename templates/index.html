@@ -1,21 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <title>Upload CSV</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1 class="mt-5">Upload CSV</h1>
-      <form action="/upload" method="post" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="file">Choose CSV file</label>
-          <input type="file" class="form-control-file" id="file" name="file">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger and CGT Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Ledger and CGT Calculator</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <form class="form-inline" action="/upload" method="post" enctype="multipart/form-data">
+                        <input class="form-control mr-sm-2" type="file" name="file" required>
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Upload</button>
+                    </form>
+                </li>
+                <li class="nav-item">
+                  <!-- just space -->
+                   <a class="nav-link">|</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary" href="/calculate_cgt">Calculate CGT</a>
+                    <!-- <a href="/calculate_cgt" class="btn btn-primary mt-3">Calculate CGT</a>-->
+                </li>
+            </ul>
         </div>
-        <button type="submit" class="btn btn-primary">Upload</button>
-      </form>
+    </nav>
+    <div class="container mt-4">
+        <h2>Transactions</h2>
+        {{ tables|safe }}
+        <h2>CGT Calculations</h2>
+        {{ cgt_tables|safe }}
     </div>
-  </body>
+</body>
 </html>
