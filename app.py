@@ -1,9 +1,11 @@
+import pycharmpatch
 from flask import Flask, request, render_template, redirect, url_for
 import pandas as pd
 from ledger import Ledger
 from csvloader import CSVLoader
 import os
 from cgt import cgt
+
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
