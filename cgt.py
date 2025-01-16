@@ -73,7 +73,11 @@ class cgt:
                 "Taxable Gains": [max(0.0, net_gains - tax_free_allowance)],
                 "CGT Liability": [yearly_cgt_liability[tax_year]],
             })
-            self.calcs = pd.concat([self.calcs, row_to_add], ignore_index=True)
+            # if self.calcs empty, then it should be row_to_add, otherwise concat
+            if self.calcs.empty:
+                self.calcs = row_to_add
+            else:
+                self.calcs = pd.concat([self.calcs, row_to_add], ignore_index=True)
 
         return yearly_cgt_liability
 
