@@ -1,4 +1,4 @@
-# Capitacl Gains Tax Calc
+# Capital Gains Tax Calc
 This is to help calculate capital gains tax on stock transactions
 
 ## Requirements
