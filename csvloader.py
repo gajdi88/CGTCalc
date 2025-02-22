@@ -1,13 +1,28 @@
 from ledger import Ledger
 import pandas as pd
 # import logging
+from werkzeug.utils import secure_filename
+import os
+from config import Config
 
 class CSVLoader:
     def __init__(self, ledger: Ledger):
         self.ledger = ledger
 
+    def allowed_file(self, filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
+
     def load_csv(self, file_path: str, template: str) -> None:
-        data = pd.read_csv(file_path, dtype={"Sedol": str})
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File not found: {file_path}")
+            
+        try:
+            data = pd.read_csv(file_path, dtype={"Sedol": str})
+        except pd.errors.EmptyDataError:
+            raise ValueError("The CSV file is empty")
+        except pd.errors.ParserError:
+            raise ValueError("Invalid CSV format")
 
         if template == "ii":
             # Clean data by handling NaNs and formatting numbers
