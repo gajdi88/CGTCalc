@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 # import logging
+from typing import Optional, Dict, Any
 
 class Ledger:
     def __init__(self):
@@ -14,14 +15,38 @@ class Ledger:
             "Tax Year", "Date"
         ])
 
-    def add_transaction(self, transation_eid: str, date: str, account_name: str, amount: float, transaction_type: str, **kwargs) -> None:
+    def add_transaction(
+        self,
+        transaction_eid: str,
+        date: str,
+        account_name: str,
+        amount: float,
+        transaction_type: str,
+        **kwargs: Any
+    ) -> None:
+        """Add a new transaction to the ledger.
+        
+        Args:
+            transaction_eid: External ID for the transaction
+            date: Transaction date in string format
+            account_name: Name of the account
+            amount: Transaction amount
+            transaction_type: Type of transaction
+            **kwargs: Additional transaction details
+                     - stock_name (str): Name of the stock
+                     - quantity (float): Number of shares
+                     - price_per_stock (float): Price per share
+        
+        Raises:
+            ValueError: If required fields are missing or invalid
+        """
         # Determine the next Transaction ID
         next_id = self.transactions["Transaction ID"].max() + 1 if not self.transactions.empty else 1
 
         # Create a new transaction row
         new_transaction = {
             "Transaction ID": next_id,
-            "Transaction External ID": transation_eid,
+            "Transaction External ID": transaction_eid,
             "Date": pd.to_datetime(date),
             "Account Name": account_name,
             "Amount": amount,

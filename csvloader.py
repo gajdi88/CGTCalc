@@ -52,7 +52,7 @@ class CSVLoader:
             for _, row in mapped_df.iterrows():
                 if row["Quantity"]>0 and row["Transaction External ID"] not in self.ledger.transactions["Transaction External ID"].values:
                     self.ledger.add_transaction(
-                        transation_eid=row["Transaction External ID"],
+                        transaction_eid=row["Transaction External ID"],
                         date=row["Date"],
                         account_name="Unknown",  # Default placeholder
                         amount=row["Amount"],
@@ -63,5 +63,7 @@ class CSVLoader:
                         description=row["Description"],
                         cpps=row["CPPS"]
                     )
+                    print(f"Added transaction: {row['Transaction External ID']}")
+                
 
 

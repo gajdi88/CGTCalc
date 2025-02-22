@@ -22,7 +22,7 @@ def get_ledger():
         g.ledger = Ledger()
     return g.ledger
 
-@app.before_first_request
+@app.before_request
 def initialize_ledger():
     get_ledger()
 
